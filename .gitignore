@@ -1,0 +1,8 @@
+node_modules/
+.firebase/
+public/vendor/
+# 実スクショ・照合用データは個人情報なので絶対に入れない
+*.png
+*.jpg
+*.jpeg
+baseline*.json

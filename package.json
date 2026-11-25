@@ -1,0 +1,25 @@
+{
+  "name": "kotsuhi-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vendor": "node scripts/copy-vendor.mjs",
+    "serve": "node scripts/serve.mjs",
+    "compare": "node test/compare.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "private": "true",
+  "devDependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "jpeg-js": "^0.4.4",
+    "pdfjs-dist": "^4.10.38",
+    "playwright-core": "^1.49.1",
+    "pngjs": "^7.0.0",
+    "tesseract.js": "^6.0.1"
+  }
+}
