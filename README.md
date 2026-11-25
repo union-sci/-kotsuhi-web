@@ -21,7 +21,7 @@ BUS（`Work/BUS/app_gui.py`）のブラウザ移植版。
 ## 使い方
 
 ```
-cd C:\Users\smizoyori\Desktop\Work\kotsuhi-web
+cd kotsuhi-web
 npm install             # 初回のみ
 npm run vendor          # 初回のみ。Tesseract.js 一式を public/vendor にコピー
 npm run serve           # http://127.0.0.1:8080/ を開く。終了は Ctrl + C
