@@ -1,0 +1,11 @@
+{
+  // タイトルバーにリポジトリ名とブランチ名を出す
+  "window.title": "${rootName} [${activeRepositoryBranchName}] - ${activeEditorShort}",
+ 
+  // 案件ごとに色を変える（各プロジェクトの .vscode/settings.json に書く）
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#073170",
+    "titleBar.activeForeground": "#ffffff",
+    "activityBar.background": "#073170"
+  }
+}
