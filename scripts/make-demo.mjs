@@ -26,10 +26,16 @@ const ALL_ROWS = [
   { date: "11/18", type: "チャージ", place: "", amount:  2000, balance: 4214 },
 ];
 
-// スクショ1: 行0–4（新しい方）/ スクショ2: 行4–8（古い方、行4が重複）
-const SCREENSHOTS = [
+// iPhone版スクショ: 行0–4 / 行4–8（行4が重複）
+const IPHONE_SHOTS = [
   { name: "IMG_001.png", rows: ALL_ROWS.slice(0, 5) },
   { name: "IMG_002.png", rows: ALL_ROWS.slice(4) },
+];
+
+// Android版スクショ: 同じデータ
+const ANDROID_SHOTS = [
+  { name: "IMG_001_android.png", rows: ALL_ROWS.slice(0, 5) },
+  { name: "IMG_002_android.png", rows: ALL_ROWS.slice(4) },
 ];
 
 // ── HTML テンプレート ──────────────────────────────────────────
@@ -117,12 +123,98 @@ body { background:#fff; }
 </body></html>`;
 }
 
+// ── Android用 HTML テンプレート ───────────────────────────────
+// 行の区切り: 全ピクセルがグレー[190,248]の帯 → findRowBoundariesAndroid に検出される
+//   rgb(215,215,215) → gray=(215×16384+8192)>>14=215 ∈ [190,248] ✓
+// 縦罫線なし → findLayout は使われず hardcoded 比率で列位置が決まる:
+//   date:  0–width*0.07=52px
+//   type:  width*0.08–width*0.33=60–247px（looksTransit の判定範囲）
+//   value: width*0.76–(width-6)=570–744px
+//   balOCR開始: valueLeft+(valueRight-valueLeft)*0.55=570+95=665px（「残高¥」プレフィックスをスキップ）
+// 日付テキスト: 薄いグレー(#999, gray=153<200) → コード内で閾値200で二値化して補正される
+// 残高表示: 「残高¥X,XXX」形式で右揃え。OCRは65px右側(665px〜)の数値部分だけ読む
+function makeAndroidHtml(rows) {
+  const fmtBalance = (n) => n.toLocaleString("en-US");
+  const fmtAmount  = (n) => n < 0
+    ? "-" + Math.abs(n).toLocaleString("en-US")
+    : Math.abs(n).toLocaleString("en-US");
+
+  // ヘッダー＋行をsepで区切る構造
+  // ・最初のsep = headerEnd（ヘッダー末尾）
+  // ・以降のsep = 行の区切り
+  const rowsHtml = rows.map((r) => `
+  <div class="row">
+    <div class="cell date">${r.date}</div>
+    <div class="cell type">${r.type}</div>
+    <div class="cell place">${r.place}</div>
+    <div class="cell value">
+      <div class="balance">残高¥${fmtBalance(r.balance)}</div>
+      <div class="amount">${fmtAmount(r.amount)}</div>
+    </div>
+  </div>
+  <div class="sep"></div>`).join("");
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#fff; }
+.screen { width:750px; font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif; }
+/* ヘッダー領域（コードは内容を使わない） */
+.app-header {
+  height: 50px; background: #fff;
+  display: flex; align-items: center; padding-left: 16px;
+  font-size: 18px; color: #333; border-bottom: none;
+}
+/* 区切り帯: 全px が gray∈[190,248] → findRowBoundariesAndroid に検出される */
+.sep { height: 4px; background: rgb(215,215,215); width: 750px; }
+/* 行: 白背景・縦罫線なし */
+.row {
+  display: grid;
+  grid-template-columns: 62px 188px 320px 180px;
+  height: 100px;
+  background: #fff;
+}
+.cell { display:flex; align-items:center; padding:0 6px; }
+/* 日付: 薄グレー → コードが閾値200で二値化して補正 */
+.date  { justify-content:center; font-size:20px; color:#999; }
+/* type: 48px で縦幅≥40px(=100×0.4) を確保 → looksTransit=true */
+.type  { justify-content:center; font-size:48px; color:#111; }
+.place { font-size:14px; color:#333; }
+/* value: 上半分=残高(「残高¥」+数字)・下半分=差額 */
+.value { flex-direction:column; padding:0; }
+.balance, .amount {
+  flex:1; display:flex; align-items:center;
+  justify-content:flex-end; padding-right:6px; font-size:19px; color:#111;
+}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="app-header">ご利用履歴</div>
+  <div class="sep"></div>
+  ${rowsHtml}
+</div>
+</body></html>`;
+}
+
 // ── Playwright でスクリーンショット撮影 ───────────────────────
 const browser = await chromium.launch({ channel: "msedge", headless: true });
 const page = await browser.newPage({ viewport: { width: 750, height: 800 } });
 
-for (const { name, rows } of SCREENSHOTS) {
+console.log("── iPhone 形式 ──");
+for (const { name, rows } of IPHONE_SHOTS) {
   await page.setContent(makeHtml(rows), { waitUntil: "networkidle" });
+  const h = await page.evaluate(() => document.querySelector(".screen").offsetHeight);
+  await page.setViewportSize({ width: 750, height: h });
+  const out = path.join(outDir, name);
+  await page.screenshot({ path: out, clip: { x: 0, y: 0, width: 750, height: h } });
+  console.log(`✓ ${name}  (${rows.length}行, ${h}px)`);
+}
+
+console.log("── Android 形式 ──");
+for (const { name, rows } of ANDROID_SHOTS) {
+  await page.setContent(makeAndroidHtml(rows), { waitUntil: "networkidle" });
   const h = await page.evaluate(() => document.querySelector(".screen").offsetHeight);
   await page.setViewportSize({ width: 750, height: h });
   const out = path.join(outDir, name);
@@ -132,5 +224,6 @@ for (const { name, rows } of SCREENSHOTS) {
 
 await browser.close();
 console.log(`\nデモ画像を ${outDir} に保存しました。`);
-console.log("npm run serve で起動後、ブラウザで IMG_001.png と IMG_002.png を両方読み込むと");
-console.log("重複除去・自動並び替え・合計1,712円が確認できます。");
+console.log("iPhone:  IMG_001.png + IMG_002.png");
+console.log("Android: IMG_001_android.png + IMG_002_android.png");
+console.log("各ペアを kotsuhi-test-1.web.app で読み込むと合計1,712円・9行になれば成功。");
