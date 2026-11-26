@@ -51,4 +51,4 @@ node test/browser.mjs <スクショのフォルダ> [開始 YYYY-MM-DD] [終了]
 - **明細PDFに対応（推奨の入力）**：モバイルSuica会員メニューの「残高ご利用明細」を印刷→PDF保存したもの。文字入りPDFなのでOCR不要・誤読なし・機種に依存しない。pdf.js（`public/vendor/pdfjs/`、自前配信）で文字を取り出し、`core.js` の `parseStatement` で解析。保存は☑の行だけの一覧表＋合計の画像（原本PDFは別添の前提）。テストは `node test/statement.mjs <PDF> [baseline.json]`
 - スクショの読み取り結果は、正式な明細PDFと全件一致した（10-11 は39行すべて、9-10 は明細期間内の23行すべて）
 - ダークモード：iPhoneでもモバイルSuicaの履歴画面は白背景のまま変わらない（2026-11-25 実機で確認）ので対応不要
-- 未対応：Android版モバイルSuicaの画面（実物のスクショ待ち）
+- Android版モバイルSuicaの画面：拾い画像で動作確認済み（実機スクショでの照合は未実施）
