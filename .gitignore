@@ -1,6 +1,7 @@
 node_modules/
 .firebase/
 public/vendor/
+demo/
 # 実スクショ・照合用データは個人情報なので絶対に入れない
 *.png
 *.jpg
