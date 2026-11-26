@@ -3,6 +3,31 @@ import { processScreenshots, buildResult, parseStatement, buildStatementResult, 
 import { readStatementPdf } from "./statement.js";
 
 const $ = (id) => document.getElementById(id);
+
+// ── アクセス合言葉ロック ──────────────────────────────────────
+// パスワード本文はソースに入れない。SHA-256ハッシュのみ保持。
+const PW_HASH = "487321421700b2665bdef037221c0c78e80f3d8269e77f454a4e237c4b7fcd6b";
+
+async function sha256hex(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function tryUnlock() {
+  const val = $("lockInput").value;
+  if ((await sha256hex(val)) === PW_HASH) {
+    $("lockScreen").remove();
+    $("mainContent").removeAttribute("hidden");
+  } else {
+    $("lockError").removeAttribute("hidden");
+    $("lockInput").value = "";
+    $("lockInput").focus();
+  }
+}
+
+$("lockButton").addEventListener("click", tryUnlock);
+$("lockInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(); });
+// ─────────────────────────────────────────────────────────────
 // mode: "image"（スクショを読み取る）／ "pdf"（明細PDFの文字を解析する）
 const state = { mode: "image", files: [], images: [], pages: [], order: [], header: null, rows: [], gaps: [], ocr: null };
 

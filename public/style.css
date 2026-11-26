@@ -118,3 +118,29 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .warning:empty { display: none; }
 
 footer { color: var(--muted); font-size: .8rem; padding-bottom: 32px; }
+
+/* ── アクセス合言葉ロック ── */
+.lock-screen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999;
+}
+.lock-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 36px 32px;
+  display: flex; flex-direction: column; gap: 14px;
+  min-width: 280px;
+}
+.lock-title { font-weight: 700; font-size: 1rem; color: var(--text); text-align: center; }
+.lock-input {
+  padding: 10px 12px; font-size: 1rem;
+  border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg); color: var(--text);
+  outline: none;
+}
+.lock-input:focus { border-color: var(--accent); }
+.lock-btn { width: 100%; }
+.lock-error { color: var(--error-text); font-size: .88rem; text-align: center; }

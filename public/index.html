@@ -11,6 +11,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- アクセス合言葉ロック：正解するまでメインコンテンツは hidden のまま -->
+  <div id="lockScreen" class="lock-screen">
+    <div class="lock-card">
+      <p class="lock-title">合言葉を入力してください</p>
+      <input type="password" id="lockInput" class="lock-input" placeholder="合言葉" autocomplete="off">
+      <button type="button" id="lockButton" class="primary lock-btn">開く</button>
+      <p id="lockError" class="lock-error" hidden>合言葉が違います</p>
+    </div>
+  </div>
+
+  <div id="mainContent" hidden>
   <header class="hero">
     <h1>交通費スクショ精算</h1>
     <p class="lead">モバイル交通系ICの利用履歴（明細PDFまたはスクショ）から、交通費の合計と精算用の一覧を作ります。</p>
@@ -69,6 +80,7 @@
   </main>
 
   <footer>処理はすべてブラウザ内で行われます。読み取りには Tesseract.js（Apache-2.0）を使用しています。</footer>
+  </div><!-- /#mainContent -->
 
   <script src="vendor/tesseract.min.js"></script>
   <script type="module" src="app.js"></script>
