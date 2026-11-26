@@ -111,12 +111,12 @@ const isPdf = (f) => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
 const isImage = (f) => /^image\/(png|jpeg)$/.test(f.type);
 
 function setFiles(fileList) {
-  const all = [...fileList].filter((f) => isPdf(f) || isImage(f));
+  const key = (f) => `${f.name}\u0000${f.size}\u0000${f.lastModified}`;
+  const seen = new Set(state.files.map(key));
+  const added = [...fileList].filter((f) => (isPdf(f) || isImage(f)) && !seen.has(key(f)));
+  const all = [...state.files, ...added];
   const pdfs = all.filter(isPdf);
   if (pdfs.length && pdfs.length !== all.length) {
-    state.files = [];
-    $("fileList").innerHTML = "";
-    $("readButton").disabled = true;
     $("status").textContent = "明細のPDFとスクショは一緒に選べません。どちらか一方を選んでください。";
     return;
   }
@@ -134,7 +134,7 @@ function setFiles(fileList) {
     : `${state.files.length} 枚を選びました。並び順は読み取った内容から自動で決めます。`;
 }
 
-$("files").addEventListener("change", (e) => setFiles(e.target.files));
+$("files").addEventListener("change", (e) => { setFiles(e.target.files); e.target.value = ""; });
 const drop = $("drop");
 drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
 drop.addEventListener("dragleave", () => drop.classList.remove("over"));
