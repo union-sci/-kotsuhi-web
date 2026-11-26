@@ -226,4 +226,4 @@ await browser.close();
 console.log(`\nデモ画像を ${outDir} に保存しました。`);
 console.log("iPhone:  IMG_001.png + IMG_002.png");
 console.log("Android: IMG_001_android.png + IMG_002_android.png");
-console.log("各ペアを kotsuhi-test-1.web.app で読み込むと合計1,712円・9行になれば成功。");
+console.log("各ペアを sample-apps-515906.web.app で読み込むと合計1,712円・9行になれば成功。");
