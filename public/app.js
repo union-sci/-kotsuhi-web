@@ -13,16 +13,11 @@ async function sha256hex(text) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function showApp() {
-  $("lockScreen").remove();
-  $("mainContent").removeAttribute("hidden");
-}
-
 async function tryUnlock() {
   const val = $("lockInput").value;
   if ((await sha256hex(val)) === PW_HASH) {
-    sessionStorage.setItem("unlocked", PW_HASH);
-    showApp();
+    $("lockScreen").remove();
+    $("mainContent").removeAttribute("hidden");
   } else {
     $("lockError").removeAttribute("hidden");
     $("lockInput").value = "";
@@ -30,13 +25,8 @@ async function tryUnlock() {
   }
 }
 
-// タブを閉じるまで再入力不要。別タブ・再起動では再ロック。
-if (sessionStorage.getItem("unlocked") === PW_HASH) {
-  showApp();
-} else {
-  $("lockButton").addEventListener("click", tryUnlock);
-  $("lockInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(); });
-}
+$("lockButton").addEventListener("click", tryUnlock);
+$("lockInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(); });
 // ─────────────────────────────────────────────────────────────
 // mode: "image"（スクショを読み取る）／ "pdf"（明細PDFの文字を解析する）
 const state = { mode: "image", files: [], images: [], pages: [], order: [], header: null, rows: [], gaps: [], ocr: null };
