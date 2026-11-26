@@ -14,9 +14,12 @@ BUS（`Work/BUS/app_gui.py`）のブラウザ移植版。
 | `public/core.js` | 結合・行の検出・読み取り・重複除去・残高の検算（DOMに依存しない。Nodeのテストと共通） |
 | `public/app.js` | 画面の制御（ファイル選択・期間・一覧・保存） |
 | `public/index.html`, `style.css` | 画面 |
+| `public/statement.js` | 明細PDFのテキスト抽出（pdf.js を使用） |
 | `public/vendor/` | Tesseract.js 一式（`npm run vendor` で生成。Git管理外） |
+| `public/vendor/pdfjs/` | pdf.js 一式（`npm run vendor` で生成。Git管理外） |
 | `test/compare.mjs` | Python版の結果（baseline.json）と1行ずつ照合 |
 | `test/browser.mjs` | インストール済みのEdgeで画面を操作し、外部通信が0件かも確認 |
+| `test/statement.mjs` | 明細PDFの解析結果を確認し、スクショ照合結果との一致も検証 |
 
 ## 使い方
 
